@@ -11,6 +11,7 @@ const wrap = document.getElementById('wrap');
 const start = document.getElementById('start');
 const count = document.getElementById('count');
 const wordCountElement = document.getElementById('wordCount');
+const wordMeaning = document.getElementById('wordMeaning');
 
 // 複数のテキストを格納する配列
 const textLists = [
@@ -69,6 +70,10 @@ const createText = () => {
 
     // テキストの意味を表示
     wordMeaning.textContent = wordMeanings[untyped];
+
+    // 単語をカウントする
+    wordCount++;
+    wordCountElement.textContent = wordCount;
 };
 
 // テキストの意味を格納
@@ -137,13 +142,16 @@ if(untyped === '') {
     createText();
     }
 
+// 単語が完了した場合 (打った文字がスペースで、次に打つべき文字が無いか別の単語の始まりの場合)
+if(e.key === ' ' && (untyped === '' || untyped.substring(0,1) !== ' ')) {
+    // 単語のカウントを増やす
+    wordCount++;
+    wordCountElement.textContent = wordCount;
+}
+
     // 正タイプの場合
         // スコアのインクリメント
         score++;
-
-        // 文字のカウント表示
-        wordCount++;
-        wordCountElement.textContent = wordCount;
 
 };
 
@@ -154,18 +162,18 @@ const rankCheck = score => {
     let text = '';
 
     // スコアに応じて異なるメッセージを変数textに格納する
-    if(score < 9) {
+    if(score < 15) {
         text = `あなたのランクはCです。\nBランクまであと少し!`;
-    }   else if(score < 15){
-        text = `あなたのランクはBです。\nAランクまであと少し!`;
     }   else if(score < 20){
+        text = `あなたのランクはBです。\nAランクまであと少し!`;
+    }   else if(score < 25){
         text = `あなたのランクはAです\nあと少しでSランク!`;
-    }   else if(score >= 20){
+    }   else if(score >= 30){
         text = `あなたのランクはSです\nおめでとうございます!`;
     }
 
     // 生成したメッセージと一緒に文字列を返す
-    return `${score}文字打てました！${text}`;
+    return `${wordCount}単語打てました！${text}`;
 
 };
 
@@ -189,12 +197,14 @@ const timer = () => {
     }, 1000);
 };
 
-// タイマーが停止したら「ゲームアップ！」と表示
+// タイマーが停止したら「ゲーム終了！」と表示
 const gameOver = id => {
     clearInterval(id);
-    untypedfield.textContent = 'タイムアップ！';
+    untypedfield.textContent = '';
+    wordMeaning.textContent = '';
+    typedfield.textContent = 'ゲーム終了！';
 
-    alert(rankCheck(score));
+    alert(rankCheck(wordCount));
 
 // OKボタンをクリックされたら最初の画面にリロードする
     setTimeout(() => {
